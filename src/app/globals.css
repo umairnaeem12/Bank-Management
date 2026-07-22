@@ -1,0 +1,263 @@
+@import 'tailwindcss';
+
+/*
+ * Dark mode is driven by a `.dark` class on <html> rather than the media
+ * query, so an explicit setting in the app can override the OS preference.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+ * Design tokens
+ *
+ * Semantic names (surface / border / muted) rather than literal colours, so a
+ * component reads as `bg-surface` and automatically resolves in either theme.
+ * ------------------------------------------------------------------------- */
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Brand — a deep institutional blue with a teal accent. */
+  --color-brand-50: #eef4ff;
+  --color-brand-100: #d9e6ff;
+  --color-brand-200: #bcd3ff;
+  --color-brand-300: #8eb6ff;
+  --color-brand-400: #598eff;
+  --color-brand-500: #3366f5;
+  --color-brand-600: #1e46e8;
+  --color-brand-700: #1836d4;
+  --color-brand-800: #1a2fac;
+  --color-brand-900: #1b2d88;
+  --color-brand-950: #141d53;
+
+  --color-accent-400: #2dd4bf;
+  --color-accent-500: #14b8a6;
+  --color-accent-600: #0d9488;
+
+  /* Status palette — used by badges, charts and toasts alike. */
+  --color-positive: #10b981;
+  --color-negative: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+
+  /* Chart series — ordered for maximum adjacent contrast. */
+  --color-chart-1: #3366f5;
+  --color-chart-2: #14b8a6;
+  --color-chart-3: #f59e0b;
+  --color-chart-4: #a855f7;
+  --color-chart-5: #ec4899;
+  --color-chart-6: #64748b;
+
+  --radius-card: 0.875rem;
+
+  --animate-fade-in: fade-in 0.24s ease-out;
+  --animate-slide-up: slide-up 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-in-right: slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-scale-in: scale-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+}
+
+/*
+ * Surface tokens are declared as plain CSS variables (not @theme) so they can
+ * be redefined inside `.dark` — @theme values are static at build time.
+ */
+:root {
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f6f8fb;
+  --surface-hover: #f1f5f9;
+  --canvas: #f6f8fb;
+  --border-subtle: #e6ebf2;
+  --border-strong: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --shadow-color: 220 20% 45%;
+}
+
+.dark {
+  --surface: #131a26;
+  --surface-raised: #182130;
+  --surface-sunken: #0d131c;
+  --surface-hover: #1e2939;
+  --canvas: #0b1017;
+  --border-subtle: #23303f;
+  --border-strong: #33445a;
+  --text-primary: #e8eef6;
+  --text-secondary: #a3b2c7;
+  --text-muted: #7c8ca4;
+  --shadow-color: 220 40% 2%;
+}
+
+/* Bridge the CSS variables into Tailwind utilities (bg-surface, text-muted…). */
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-hover: var(--surface-hover);
+  --color-canvas: var(--canvas);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-primary-text: var(--text-primary);
+  --color-secondary-text: var(--text-secondary);
+  --color-muted-text: var(--text-muted);
+}
+
+/* ---------------------------------------------------------------------------
+ * Base
+ * ------------------------------------------------------------------------- */
+
+@layer base {
+  * {
+    border-color: var(--border-subtle);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Tabular figures keep currency columns aligned across rows. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-200);
+    color: var(--color-brand-950);
+  }
+
+  .dark ::selection {
+    background-color: var(--color-brand-800);
+    color: var(--color-brand-50);
+  }
+
+  /* Slim, theme-aware scrollbars. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--border-strong);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-muted);
+    background-clip: content-box;
+  }
+
+  /* Honour the OS "reduce motion" setting for every animation in the app. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Utilities
+ * ------------------------------------------------------------------------- */
+
+@utility card-shadow {
+  box-shadow:
+    0 1px 2px -1px hsl(var(--shadow-color) / 0.12),
+    0 2px 8px -2px hsl(var(--shadow-color) / 0.08);
+}
+
+@utility card-shadow-lg {
+  box-shadow:
+    0 4px 12px -2px hsl(var(--shadow-color) / 0.14),
+    0 12px 32px -8px hsl(var(--shadow-color) / 0.16);
+}
+
+/* ---------------------------------------------------------------------------
+ * Keyframes
+ * ------------------------------------------------------------------------- */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Recharts injects its own focus outline on chart surfaces; suppress it. */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}
+
+/* Print: strip the shell so exported/printed pages carry only content. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+}
